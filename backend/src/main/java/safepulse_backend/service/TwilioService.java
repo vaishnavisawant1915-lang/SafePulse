@@ -13,10 +13,20 @@ public class TwilioService {
     private final String fromNumber = System.getenv("TWILIO_FROM_NUMBER");
 
     public TwilioService() {
-        Twilio.init(accountSid, authToken);
+        if (accountSid != null && !accountSid.isBlank()
+                && authToken != null && !authToken.isBlank()) {
+            Twilio.init(accountSid, authToken);
+        }
     }
 
     public void sendSms(String to, String body) {
+        if (accountSid == null || accountSid.isBlank()
+                || authToken == null || authToken.isBlank()
+                || fromNumber == null || fromNumber.isBlank()) {
+            throw new IllegalStateException(
+                    "Twilio is not configured. SMS sending is unavailable."
+            );
+        }
 
         Message.creator(
                 new PhoneNumber(to),
